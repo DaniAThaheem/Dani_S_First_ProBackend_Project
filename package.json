@@ -4,7 +4,11 @@
   "description": "Building Professional Project With Hitesh Ch.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodemon src/index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7",
+    "prettier": "^3.4.1"
   },
   "keywords": [
     "Backend",
