@@ -1,0 +1,15 @@
+{
+  "name": "building_professional_project",
+  "version": "1.0.0",
+  "description": "Building Professional Project With Hitesh Ch.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Backend",
+    "Dani"
+  ],
+  "author": "Danish A.",
+  "license": "ISC"
+}
