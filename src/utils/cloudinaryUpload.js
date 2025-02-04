@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { log } from 'console';
 import dotenv from "dotenv";
 dotenv.config({path: '../env'})
 import fs from 'fs'
