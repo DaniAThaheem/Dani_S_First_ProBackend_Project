@@ -3,6 +3,7 @@ import cors from "cors"
 import dotenv from "dotenv";
 dotenv.config({path: '../env'})
 import cookieParser from "cookie-parser"
+import userRouter from "./routes/user.routes.js"
 
 const app = express()
 
@@ -28,3 +29,9 @@ app.use(express.urlencoded(
 app.use(express.static("public"))
 
 app.use(cookieParser())
+
+
+
+
+
+app.use("/user", userRouter)
