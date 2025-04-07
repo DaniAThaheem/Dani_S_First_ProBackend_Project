@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 dotenv.config({path: '../env'})
 import cookieParser from "cookie-parser"
 import userRouter from "./routes/user.routes.js"
+import subscriptionRouter from "./routes/subscription.routes.js"
+import videoRouter from "./routes/video.routes.js"
 
 const app = express()
 
@@ -34,4 +36,7 @@ app.use(cookieParser())
 
 
 
-app.use("/user", userRouter)
+app.use("/api/v1/user", userRouter)
+app.use("/api/v1/video", videoRouter)
+
+app.use("/api/v1/subscription", subscriptionRouter)

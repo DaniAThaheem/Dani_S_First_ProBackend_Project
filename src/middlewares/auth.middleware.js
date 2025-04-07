@@ -6,7 +6,7 @@ import { User } from "../models/user.model";
 
 
 const jwtVerify = asyncHandler(
-    async(req, res, next)=>{
+    async(req, _, next)=>{
         const accessToken = req.cookies.accessToken || req.header("Authorization").replace("bearer ", "")
 
 
@@ -22,3 +22,5 @@ const jwtVerify = asyncHandler(
         next()
     }
 )
+
+export {jwtVerify}
