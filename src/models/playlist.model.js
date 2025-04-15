@@ -1,12 +1,15 @@
 import mongoose, { Schema } from "mongoose";
+i
 
 const playlistSchema = new Schema(
     {
         name:{
-            type: String
+            type: String,
+            required: true
         },
         description:{
-            type: String
+            type: String,
+            required: true
         },
         videos:[
             {
@@ -23,5 +26,7 @@ const playlistSchema = new Schema(
         timestamps: true
     }
 )
+
+playlistSchema.plugin()
 
 export const Playlist = mongoose.model("Playlist", playlistSchema)

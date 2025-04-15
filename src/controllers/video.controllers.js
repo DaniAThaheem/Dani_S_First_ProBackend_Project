@@ -5,6 +5,41 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import { cloudinaryDestroy } from "../utils/cloudinaryDestroy.js";
 import { cloudinaryUpload } from "../utils/cloudinaryUpload.js";
 
+//Logic 3: Get all videos
+const getAllVideos = asyncHandler(async(req, res)=>{
+    const {page=1, limit=10, query, sortBy, sortType, userID} = req.query
+
+    // When you want to use the already decleared varialbe as a key in the object you have to use [] otherwise it will be decleared as a key literal
+
+    const sortOrder = { [sortBy] : sortType === "asc"? 1:-1}
+    const videos = await Video.find(
+        {
+            owner:userID,
+            title:{
+                $regex: query,
+                $options:'i'
+            }
+        }
+       
+    )
+    .sort(sortOrder)
+     //Formula to skip video viewed in previous page
+    .skip((page-1)*limit)
+    .limit(limit)
+
+    if(!videos){
+        throw new ApiError(500, "Could not get videos")
+    }
+    return res
+    .statusCode(200)
+    .json(
+        new ApiResponse(
+            200,
+            videos,
+            "fetched all videos successfully"
+        )
+    )
+})
 
 
 // Logic 2: Publishing a video
@@ -220,6 +255,7 @@ const togglePublishStatus = asyncHandler( async(req, res)=>{
 
 
 export {
+    getAllVideos,
     publishAVideo,
     getVideoById,
     updateVideo,

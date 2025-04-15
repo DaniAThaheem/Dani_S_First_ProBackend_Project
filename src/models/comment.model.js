@@ -2,7 +2,8 @@ import mongoose, { Schema } from "mongoose";
 const commentSchema = new Schema(
     {
         content:{
-            type: String
+            type: String,
+            requried: true
         },
         video:{
             type: mongoose.Schema.Types.ObjectId,
