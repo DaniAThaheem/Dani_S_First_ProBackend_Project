@@ -10,7 +10,7 @@ const  getChannelStats = asyncHandler(async(req, res)=>{
     const {userID} = req.user._id
     // subscribers
 
-    const channelStats = User.aggregate(
+    const channelStats = await User.aggregate(
         [
             {
                 $match:{
@@ -121,7 +121,7 @@ const getChannelVideos = asyncHandler(async(req, res)=>{
 
     const {userID} = req.user._id
 
-    const channelVideos = Video.find(
+    const channelVideos = await Video.find(
         {
             owner: userID
         }       
