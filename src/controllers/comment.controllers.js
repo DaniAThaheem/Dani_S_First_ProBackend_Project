@@ -1,8 +1,7 @@
-import req from "express/lib/request";
-import { Comment } from "../models/comment.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Comment } from "../models/comment.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 const getVideoComment = asyncHandler(async(req, res)=>{
@@ -100,6 +99,7 @@ const deleteComment = asyncHandler(async(req, res)=>{
 })
 
 export{
+    getVideoComment,
     addComment,
     updateComment,
     deleteComment

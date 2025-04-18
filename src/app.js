@@ -52,3 +52,6 @@ app.use("/api/v1/like", likeRouter)
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/dashboardRouter", dashboardRouter)
 app.use("/api/v1/comment", commentRouter)
+
+
+export {app}
