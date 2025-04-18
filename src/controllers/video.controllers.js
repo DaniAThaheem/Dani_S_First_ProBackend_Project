@@ -152,7 +152,7 @@ const updateVideo = asyncHandler( async( req, res)=>{
 
     const result = await cloudinaryDestroy(oldVideoObj.thumbnail)
 
-    if( result.result !=="ok"){
+    if( result !=='ok'){
         throw new ApiError(500, "Could not remove existing thumbnail")
     }
 
