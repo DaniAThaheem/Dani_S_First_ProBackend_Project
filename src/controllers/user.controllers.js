@@ -5,6 +5,7 @@ import {cloudinaryUpload} from "../utils/cloudinaryUpload.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { jwt } from "jsonwebtoken"
 import { mongoose } from "mongoose"
+import {cloudinaryDestroy} from "../utils/cloudinaryDestroy.js"
 
 //Generate access and refresh token
 
@@ -265,7 +266,7 @@ const updateUser = asyncHandler(
             throw new ApiError(400 , "fullName or email are required")
         }
 
-        const user = await User.findOneAndUpdate(
+        const user = await User.findByIdAndUpdate(
             req.user?._id,
             {
                 $set:{
@@ -291,6 +292,13 @@ const updateAvatar = asyncHandler(
         const avatarUrl = req.file               //?.avatar[0]?.path
         if(!avatar){
             throw new ApiError(400, "Avatar Required")
+        }
+
+        const oldUser = await User.findById(req.user?._id)
+        const result = await cloudinaryDestroy(oldUser.avatar)
+
+        if(result !== 'ok'){
+            throw new ApiError(500, "failed to delete file from cloudinary")
         }
         const avatar = await cloudinaryUpload(avatarUrl)
 
