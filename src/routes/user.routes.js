@@ -1,10 +1,16 @@
-import {Router} from "express"
+import express from "express"
 import {upload} from "../middlewares/multer.middleware.js"
-import { registerUser } from "../controllers/user.controllers.js";
+import { loginUser, logoutUser, registerUser } from "../controllers/user.controllers.js";
+import { jwtVerify } from "../middlewares/auth.middleware.js";
 
-const router = Router();
+const router = express.Router();
+//remove the middleware then send the request
 
-router.route("/register").post(
+router.route('/').get((req, res)=>{
+    res.send("api is running in user.routes.js...")
+})
+
+router.route('/register').post(
     upload.fields(
         [
             {   
@@ -18,5 +24,8 @@ router.route("/register").post(
         ]
     )
     ,registerUser)
+
+router.route('/login').post(loginUser)
+router.route('/logout').get(jwtVerify, logoutUser)
 
 export default router

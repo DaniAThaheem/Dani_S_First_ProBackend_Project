@@ -14,7 +14,7 @@ const generateAccessAndRefreshToken = async(userId)=>{
     
     const accessToken = await user.generateAccessToken();
     const refreshToken = await user.generateRefreshToken();
-    user.refreshtoken = refreshToken;
+    user.refreshToken = refreshToken;
     await user.save({validateBeforeSave: true})
     
     return {accessToken, refreshToken}
@@ -24,6 +24,7 @@ const generateAccessAndRefreshToken = async(userId)=>{
 const registerUser = asyncHandler(
     async(req, res)=>{
         const {username, email, fullname, password} = req.body;
+        console.log(username, email, fullname, password)
 
         if(
             [username, email, fullname, password]
@@ -79,8 +80,15 @@ const registerUser = asyncHandler(
             throw new ApiError(500, "Couldn't register user")
         }
         
-        return res.statusCode(201).json(
-            new ApiResponse(200, "User Registered Success fully", userResponse)
+        return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                userResponse,
+                "User Registered Success fully"
+            
+            )
         )
 
 
@@ -92,7 +100,9 @@ const registerUser = asyncHandler(
 const loginUser = asyncHandler(
     async(req, res)=>{
         const {username, email, password} = req.body;
-        if(!username||!email){
+        console.log(username, email, password);
+        
+        if(!(username||email)){
             throw new ApiError(400, "Username or Email is required field")
 
         }
@@ -105,7 +115,9 @@ const loginUser = asyncHandler(
         if(!password){
             throw new ApiError(400, "password is necessary field")
         }
+        
         const isPwdCorrect = await user.isPasswordCorrect(password)
+        console.log(isPwdCorrect);
         if(!isPwdCorrect){
             throw new ApiError(401, "Invalid Password")
         }
@@ -120,8 +132,8 @@ const loginUser = asyncHandler(
         
         return res
         .status(200)
-        .cookies("accessToken", accessToken. options)
-        .cookies("refreshTokenn", refreshToken, options)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshTokenn", refreshToken, options)
         .json(
             new ApiResponse(
                 200,
@@ -141,6 +153,8 @@ const loginUser = asyncHandler(
 const logoutUser = asyncHandler(
     async(req, res)=>{
         const userId = req.user?._id
+        console.log(await User.findById(userId));
+        
         const logoutUser = await User.findOneAndUpdate(
             userId,
             {
@@ -159,8 +173,8 @@ const logoutUser = asyncHandler(
         }
         return res
         .status(200)
-        .clearCookies("accessToken", options)
-        .clearCookies("refreshToken", options
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
         .json(
             new ApiResponse(
                 200,
@@ -169,7 +183,7 @@ const logoutUser = asyncHandler(
                 "Logout Successfully"
             )
         )
-        )
+        
 
     }
 

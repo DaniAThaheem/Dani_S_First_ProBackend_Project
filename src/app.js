@@ -15,7 +15,20 @@ import commentRouter from "./routes/comment.routes.js"
 
 const app = express()
 
+//for testing
+app.get("/", (req, res)=>{
+    res.send("api is running...")
+})
 
+
+//for testing
+// app.use((err, req, res, next)=>{
+//     console.error(err.stack);
+//     res.status(500).json({
+//         error: "Internal serverr error",
+//         details: err.message
+//     })
+// })
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     cridentials: true
@@ -33,16 +46,20 @@ app.use(express.urlencoded(
         limit: "16kb"
     }
 ))
+app.use(cookieParser())
 
 app.use(express.static("public"))
 
-app.use(cookieParser())
 
 
 
 
 
-app.use("/api/v1/user", userRouter)
+app.use("/api/v1/users", userRouter)
+//for testing
+app.use((req, res)=>{
+    res.status(404).json({message:"route not found"})
+})
 app.use("/api/v1/video", videoRouter)
 
 app.use("/api/v1/subscription", subscriptionRouter)
@@ -54,4 +71,4 @@ app.use("/api/v1/dashboardRouter", dashboardRouter)
 app.use("/api/v1/comment", commentRouter)
 
 
-export {app}
+export { app }
