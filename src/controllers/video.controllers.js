@@ -49,8 +49,12 @@ const publishAVideo = asyncHandler( async(req, res)=>{
     //Get other fileds
     const {title, description, isPublic } = req.body;
     // Get local path
+    console.log(title,description, isPublic);
+    
     const vidosUrl = req.files?.video[0]?.path;
     const thumbnailUrl = req.files?.thumbnail[0]?.path;
+    console.log(vidosUrl, thumbnailUrl);
+    
 
     // Validate
 
@@ -96,7 +100,7 @@ const publishAVideo = asyncHandler( async(req, res)=>{
     }
     // Sending response
     return res
-    .statusCode(201)
+    .status(201)
     .json(
         new ApiResponse(
             201,
@@ -125,7 +129,7 @@ const getVideoById = asyncHandler( async (req, res) => {
     }
 
     return res
-    .statusCode(201)
+    .status(201)
     .json(
         new ApiResponse(
             201,
@@ -140,7 +144,7 @@ const getVideoById = asyncHandler( async (req, res) => {
 const updateVideo = asyncHandler( async( req, res)=>{
     const {videoID} = req.params;
     const {title, description} = req.body
-    const thumbnailUrl = req.file
+    const thumbnailUrl = req.file.path
 
     if(!thumbnailUrl){
         throw new ApiError(400, "Could not get thumbnail url")
@@ -178,7 +182,7 @@ const updateVideo = asyncHandler( async( req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -210,7 +214,7 @@ const deleteVideo = asyncHandler( async( req, res)=>{
     }
 
     return res
-    .statusCode(204)
+    .status(204)
     .json(
         new ApiResponse(
             204,
@@ -228,10 +232,16 @@ const togglePublishStatus = asyncHandler( async(req, res)=>{
     if(!oldVideoObj){
         throw new ApiError(400,  "Could  not find Video")
     }
-    const newVideoObj = await Video.findByIdAndUpdate(videoID,
+    const newVideoObj = await Video.findByIdAndUpdate(
+        videoID,
         {
-            isPublic : !oldVideoObj.isPublic
-            
+          $set:{
+              isPublic : !oldVideoObj.isPublic
+
+          }           
+        },
+        {
+            new:true
         }
     )
     if(!newVideoObj){
@@ -242,7 +252,7 @@ const togglePublishStatus = asyncHandler( async(req, res)=>{
     // video.isPublic = video.isPublic? false: true
     // await video.save({isNew:false})
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,

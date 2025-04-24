@@ -25,7 +25,7 @@ router.route("/publish").post(
     ),
     publishAVideo)
 router.route("/:videoID")
-.post(
+.get(
     getVideoById
 )
 .patch(
