@@ -1,6 +1,6 @@
 import express from "express"
 import {upload} from "../middlewares/multer.middleware.js"
-import { changePassword, getUserData, loginUser, logoutUser, refreshAccessToken, registerUser, updateAvatar, updateUser } from "../controllers/user.controllers.js";
+import { changePassword, getUserData, getUserInfo, getWatchHistory, loginUser, logoutUser, refreshAccessToken, registerUser, updateAvatar, updateUser } from "../controllers/user.controllers.js";
 import { jwtVerify } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -33,6 +33,6 @@ router.route('/current-user').get(jwtVerify, getUserData)
 router.route('/update-account').patch(jwtVerify, updateUser)
 router.route('/avatar').patch(jwtVerify, upload.single("avatar"), updateAvatar)
 // router.route('/cover-image').patch(jwtVerify, upload.single("coverImage"), update)
-
-
+router.route('/c/:username').get(jwtVerify,getUserInfo)
+router.route('/history').get(jwtVerify, getWatchHistory)
 export default router

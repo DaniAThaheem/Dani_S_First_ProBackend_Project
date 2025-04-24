@@ -356,13 +356,13 @@ const updateAvatar = asyncHandler(
 const getUserInfo = asyncHandler(
     async(req, res)=>{
 
-        const {user} = req.params;
+        const {username} = req.params;
         
         const userInfo = await User.aggregate(
         [
             {
                 $match:{
-                    username : user?.toLowerCase()
+                    username : username?.toLowerCase()
                 }
             },
             {
@@ -389,10 +389,15 @@ const getUserInfo = asyncHandler(
                     },
                     subscribedToCount:{
                         $size:"$subscribedTo"
-                    },
+                    }
+                    ,
                     isSubscribed:{
                         $cond:{
-                            $if:{$in:[req.user?._id, "$subscribers.subscriber"]},
+                            if:{
+                                $in:[
+                                    req.user?._id,
+                                    "$subscribers.subscriber"]
+                            },
                             then:true,
                             else:false
                         }
@@ -434,12 +439,12 @@ const getWatchHistory = asyncHandler(
             [
                 {
                     $match:{
-                        _id: mongoose.Types.ObjectId(uID)
+                        _id: new mongoose.Types.ObjectId(uID)
                     }
                 },
                 {
                     $lookup:{
-                        form: "videos",
+                        from: "videos",
                         localField:"watchHistory",
                         foreignField:"_id",
                         as:"watchHistory",
