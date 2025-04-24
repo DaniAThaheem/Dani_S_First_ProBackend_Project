@@ -17,19 +17,27 @@ const getPublicID = function(url){
     //you got the version and folder with file name and extension
     //split method split the array into three parts version folder and file name.. slice(1) will keep everything in array from the index 1 to onwards... join("/") join the array into the string using the /
     const filePath = importantPathofUrl.split('/').slice(1).join('/')
+    console.log((filePath));
+    
     // when we will remove the extension of the file the remaining folder and file name is the public key...using the strig methods to remove the extension instead of regex....lastIndexOf method checks the last index of the given character.. 
     const dotIndex = filePath.lastIndexOf(".")
+    console.log(dotIndex);
+    
     //using the ternery operatory to get the substring from the index of 0 to just before the index of the dot if dot does not exist then take the filePath as a public id
-    const publicId = dotIndex!==-1? filePath.subString(0, dotIndex):  filePath
+    const publicId = dotIndex!==-1? filePath.slice(0, dotIndex):  filePath
     return publicId
 
 }
 const cloudinaryDestroy = async function(fileURL) {
 
     try {
+        
         const publicId = getPublicID(fileURL)
+        console.log(publicId);
         const result = await cloudinary.uploader.destroy(publicId)
-        return result.result === 'ok'  
+        console.log(result);
+        
+        return result.result
     } catch (error) {
         console.error("Error while removing file in cloudinary", error)
         return false

@@ -1,6 +1,6 @@
 import express from "express"
 import {upload} from "../middlewares/multer.middleware.js"
-import { loginUser, logoutUser, registerUser } from "../controllers/user.controllers.js";
+import { changePassword, getUserData, loginUser, logoutUser, refreshAccessToken, registerUser, updateAvatar, updateUser } from "../controllers/user.controllers.js";
 import { jwtVerify } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -25,7 +25,14 @@ router.route('/register').post(
     )
     ,registerUser)
 
-router.route('/login').post(loginUser)
+router.route('/login').get(loginUser)
 router.route('/logout').get(jwtVerify, logoutUser)
+router.route('/refresh-token').post(refreshAccessToken)
+router.route('/change-password').post(jwtVerify, changePassword)
+router.route('/current-user').get(jwtVerify, getUserData)
+router.route('/update-account').patch(jwtVerify, updateUser)
+router.route('/avatar').patch(jwtVerify, upload.single("avatar"), updateAvatar)
+// router.route('/cover-image').patch(jwtVerify, upload.single("coverImage"), update)
+
 
 export default router

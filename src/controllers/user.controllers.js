@@ -15,7 +15,7 @@ const generateAccessAndRefreshToken = async(userId)=>{
     const accessToken = await user.generateAccessToken();
     const refreshToken = await user.generateRefreshToken();
     user.refreshToken = refreshToken;
-    await user.save({validateBeforeSave: true})
+    await user.save({validateBeforeSave: false})
     
     return {accessToken, refreshToken}
 }
@@ -133,7 +133,7 @@ const loginUser = asyncHandler(
         return res
         .status(200)
         .cookie("accessToken", accessToken, options)
-        .cookie("refreshTokenn", refreshToken, options)
+        .cookie("refreshToken", refreshToken, options)
         .json(
             new ApiResponse(
                 200,
@@ -191,6 +191,8 @@ const logoutUser = asyncHandler(
 const refreshAccessToken = asyncHandler(
     async(req, res)=>{
         const userRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+        console.log(userRefreshToken);
+        
         if(!userRefreshToken){
             throw new ApiError(401, "Invalid Refresh Token")
         }
@@ -236,16 +238,19 @@ const refreshAccessToken = asyncHandler(
 const changePassword = asyncHandler(
     async(req, res)=>{
         const { oldPassword,newPassword } = req.body
-
+        console.log(oldPassword, newPassword);
+        
         const user = await User.findById(req.user?._id)
 
         const isPwdOkay = await user.isPasswordCorrect(oldPassword)
+        console.log(isPwdOkay);
+        
         if(!isPwdOkay){
             throw new ApiError(401, "Invalid Password")
         }
         user.password = newPassword
 
-        await user.save({validateBeforeSave})
+        await user.save({validateBeforeSave:false})
 
         return res
         .status(200)
@@ -275,8 +280,8 @@ const getUserData = asyncHandler(
 
 const updateUser = asyncHandler(
     async(req, res)=>{
-        const {fullName, email} = req.body
-        if(!fullName || !email){
+        const {fullname, email} = req.body
+        if(!fullname || !email){
             throw new ApiError(400 , "fullName or email are required")
         }
 
@@ -284,9 +289,12 @@ const updateUser = asyncHandler(
             req.user?._id,
             {
                 $set:{
-                    fullName,
+                    fullname,
                     email
                 }
+            },
+            {
+                new: true
             }
         ).select("-password -refreshToken")
         return res    
@@ -303,23 +311,28 @@ const updateUser = asyncHandler(
 
 const updateAvatar = asyncHandler(
     async(req, res)=>{
-        const avatarUrl = req.file               //?.avatar[0]?.path
-        if(!avatar){
+        const avatarUrl = req.file.path               //?.avatar[0]?.path
+        if(!avatarUrl){
             throw new ApiError(400, "Avatar Required")
         }
 
         const oldUser = await User.findById(req.user?._id)
+        console.log(oldUser);
+        
         const result = await cloudinaryDestroy(oldUser.avatar)
-
+        console.log(result);
+        
         if(result !== 'ok'){
             throw new ApiError(500, "failed to delete file from cloudinary")
         }
+        console.log(avatarUrl);
+        
         const avatar = await cloudinaryUpload(avatarUrl)
 
         const user = await User.findOneAndUpdate(
             req.user?._id,
             {
-                avatar
+                avatar:avatar.url
             },
             {
                 new: true
@@ -483,6 +496,7 @@ export {
     getUserData,
     updateUser,
     updateAvatar,
+    
     getUserInfo,
     getWatchHistory
 
