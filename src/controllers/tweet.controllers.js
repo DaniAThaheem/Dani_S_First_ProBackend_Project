@@ -23,7 +23,7 @@ const createTweet = asyncHandler(async(req, res)=>{
         throw new ApiError(500, "Error while making a tweet")
     }
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -38,15 +38,23 @@ const createTweet = asyncHandler(async(req, res)=>{
 
 const getUserTweets = asyncHandler(async(req, res)=>{
     const {userID} = req.params
+    console.log(userID);
+    
 
-    const tweets = Tweet.findById(userID)
+    const tweets = await Tweet.find(
+        {
+            owner: userID
+        }
+    )
+    console.log(tweets);
+    
 
     if(!tweets){
         throw new ApiError(500, "Could not find tweets")
     }
 
     return res 
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -63,8 +71,8 @@ const updateTweet = asyncHandler(async(req, res)=>{
     const {tweetID} = req.params
     const {content} = req.body
 
-    const updatedTweet = Tweet.findByIdAndUpdate(
-        {tweetID},
+    const updatedTweet = await Tweet.findByIdAndUpdate(
+        tweetID,
         {
             $set:{
                 content
@@ -80,7 +88,7 @@ const updateTweet = asyncHandler(async(req, res)=>{
         )
     }
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -94,12 +102,12 @@ const updateTweet = asyncHandler(async(req, res)=>{
 // Logic 4:- Delete Tweet
 const deleteTweet = asyncHandler(async(req, res)=>{
     const {tweetID} = req.params
-    const tweetDelStatus = Tweet.findByIdAndDelete(tweetID)
+    const tweetDelStatus = await Tweet.findByIdAndDelete(tweetID)
     if(!tweetDelStatus){
         throw new ApiError(500, "Could not delete status")
     }
     return res
-    .statusCode(203)
+    .status(203)
     .json(
         new ApiResponse(
             203,
