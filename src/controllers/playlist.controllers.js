@@ -7,7 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 //Logic 1:- Create a new playlist
 const createPlaylist = asyncHandler( async(req, res)=>{
     const {name, description} = req.body;
-    const {owner} = req.user?._id
+    const  owner = req.user?._id
 
     if(!(name || description)){
         throw new ApiError(400, "name or description of the playlist is not given")
