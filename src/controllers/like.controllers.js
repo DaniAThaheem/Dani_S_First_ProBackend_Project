@@ -1,14 +1,12 @@
-import req from "express/lib/request.js";
 import { Like } from "../models/like.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
-import mongoose from "mongoose";
-
+import { mongoose } from "mongoose";
 const toggleVideoLike = asyncHandler( async (req, res)=>{
     const {videoID} = req.params
-    const {userID} = req.user?._id
+    const userID = req.user?._id
 
     //find by video and user id
     const existingLike = await Like.findOne(
@@ -23,7 +21,7 @@ const toggleVideoLike = asyncHandler( async (req, res)=>{
         try {
             await Like.findByIdAndDelete(existingLike._id)
             return res
-            .statusCode(203)
+            .status(203)
             .json(
                 new ApiResponse(
                     203,
@@ -52,7 +50,7 @@ const toggleVideoLike = asyncHandler( async (req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -64,7 +62,7 @@ const toggleVideoLike = asyncHandler( async (req, res)=>{
 
 const toggleCommentLike = asyncHandler(async(req, res)=>{
     const {commentID} =req.params
-    const {userID} = req.user?._id
+    const userID = req.user?._id
 
     const existingLike = await Like.findOne(
         {
@@ -77,7 +75,7 @@ const toggleCommentLike = asyncHandler(async(req, res)=>{
         try {
             await Like.findByIdAndDelete(existingLike._id)
             return res
-            .statusCode(203)
+            .status(203)
             .json(
                 new ApiResponse(
                     203,
@@ -103,7 +101,7 @@ const toggleCommentLike = asyncHandler(async(req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -115,7 +113,7 @@ const toggleCommentLike = asyncHandler(async(req, res)=>{
 
 const toggleTweetLike = asyncHandler(async(req, res)=>{
     const {tweetID} = req.params
-    const {userID} = req.user?._id
+    const userID = req.user?._id
     const existingLike = await Like.findOne(
         {
             tweet:tweetID,
@@ -127,7 +125,7 @@ const toggleTweetLike = asyncHandler(async(req, res)=>{
         try {
             await Like.findByIdAndDelete(existingLike._id)
             return res
-            .statusCode(203)
+            .status(203)
             .json(
                 new ApiResponse(
                     203,
@@ -153,7 +151,7 @@ const toggleTweetLike = asyncHandler(async(req, res)=>{
     }
     
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -164,17 +162,23 @@ const toggleTweetLike = asyncHandler(async(req, res)=>{
 })
 
 const getLikedVideos = asyncHandler(async(req, res)=>{
-    const { userID } = req.user?._id
+    const  userID  = req.user?._id
+    console.log(userID);
 
+    const userInfo =await User.findById(userID)
+
+    console.log(userInfo);
+    
     const userWithVideos = await User.aggregate(
         [
             //Fetched the user
             {
                 $match:{
-                    _id: mongoose.Schema.Types.ObjectId(userID)
+                    username: userInfo.username
+
                 }
             },
-            //Get all documents liked by the users
+            // //Get all documents liked by the users
             {
                 $lookup:{
                     from:"likes",
@@ -183,7 +187,8 @@ const getLikedVideos = asyncHandler(async(req, res)=>{
                     as:"liked"
                 }
 
-            },
+            }
+            ,
             //Ripapart the array of documents 
             {
                 $unwind:"$liked"
@@ -221,11 +226,11 @@ const getLikedVideos = asyncHandler(async(req, res)=>{
         throw new ApiError(500, "Could not fetch videos")
     }
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
-            userWithVideos[0].liked,
+            userWithVideos,
             "All videos fetched successfully"
         )
     )

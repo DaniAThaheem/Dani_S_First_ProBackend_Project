@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import {mongoose} from "mongoose";
 import { Playlist } from "../models/playlist.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -24,7 +24,7 @@ const createPlaylist = asyncHandler( async(req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -44,7 +44,7 @@ const allUserPlaylists = asyncHandler( async(req, res)=>{
             {
                 //Get all the videos of the owner with that user ID
                 $match:{
-                    owner: mongoose.Schema.Types.ObjectId(userID)
+                    owner:new mongoose.Types.ObjectId(userID)
                 }
             },
             {
@@ -74,14 +74,15 @@ const allUserPlaylists = asyncHandler( async(req, res)=>{
                         }
                     ]
                 }
-            },
-            {
-                $addFields:{
-                    owner:{
-                        $first:"$videos"
-                    }
-                }
             }
+            // ,
+            // {
+            //     $addFields:{
+            //         owner:{
+            //             $first:"$videos"
+            //         }
+            //     }
+            // }
         ]
     )
 
@@ -90,7 +91,7 @@ const allUserPlaylists = asyncHandler( async(req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -109,7 +110,7 @@ const getPlaylistById = asyncHandler( async(req, res)=>{
         [
             {
                 $match:{
-                        _id:mongoose.Schema.Types.ObjectId(playlistID)
+                        _id:new mongoose.Types.ObjectId(playlistID)
                 }
             },
             {
@@ -154,7 +155,7 @@ const getPlaylistById = asyncHandler( async(req, res)=>{
         throw new ApiError(500, "Could not find a playlist")
     }
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -169,7 +170,7 @@ const addVideoToPlaylist = asyncHandler(async(req, res)=>{
     const {videoID, playlistID} = req.params
 
     const updatedPlaylistContent = await Playlist.findByIdAndUpdate(
-        {playlistID},
+        playlistID,
         {
             $push:{
                 videos:videoID
@@ -186,7 +187,7 @@ const addVideoToPlaylist = asyncHandler(async(req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -217,7 +218,7 @@ const removeVideoFromPlaylist = asyncHandler(
             throw new ApiError(500, "Could not remove video from  the playlist")
         }
         return res
-        .statusCode(200)
+        .status(200)
         .json(
             new ApiResponse(
                 200, 
@@ -232,7 +233,7 @@ const updatePlaylist = asyncHandler(async(req, res)=>{
     const {name, description} = req.body
 
     const updatedPlaylist = await Playlist.findByIdAndUpdate(
-        {playlistID},
+        playlistID,
         {
             $set:{
                 name: name,
@@ -248,11 +249,11 @@ const updatePlaylist = asyncHandler(async(req, res)=>{
     }
 
     return res 
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
-            updatePlaylist,
+            updatedPlaylist,
             "Playlist information updated successfully"
         )
     )
@@ -261,13 +262,13 @@ const updatePlaylist = asyncHandler(async(req, res)=>{
 const deletePlaylist = asyncHandler( async( req, res )=>{
     const {playlistID} = req.params
     
-    const deletedPlaylisst = await Playlist.findByIdAndDelete({playlistID})
+    const deletedPlaylisst = await Playlist.findByIdAndDelete(playlistID)
 
     if(!deletePlaylist){
         throw new ApiError(500, "Could not delete the playlist ")
     }
     return res
-    .statusCode(203)
+    .status(203)
     .json(
         new ApiResponse(
             203,
