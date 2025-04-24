@@ -6,13 +6,15 @@ const subscriptionSchema = new Schema(
         //Channel that subscribed me
         channel:{
             type: Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
+            required:true
         },
 
         //Channel to whom I am subscriber of
         subscriber:{
             type: Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
+            required: true
         }
     },
     {

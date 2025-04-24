@@ -2,31 +2,83 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import {mongoose} from "mongoose";
+import { Subscription } from "../models/subscription.model.js";
 
 
 const toggleSubscription = asyncHandler( async(req, res)=>{
-    const {channelID} = req.params
-    const {userID} = req.user?._id
+    const {channelId} = req.params
+    const userID = req.user?._id
+    console.log((channelId));
+    
+    
+    //check if the user is subscriber of the channel then remove or pull it out out of the arry
+    const SubscribedChannel = await Subscription.find(
+        {
+            channel: channelId,
+            subscriber: userID
+        }
+    )
+    console.log(SubscribedChannel);
+    
 
+    if(SubscribedChannel.length!==0){
+        try {
+            const deletionResult = await Subscription.findByIdAndDelete(SubscribedChannel[0]._id)
+            return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    deletionResult,
+                    "Subscriber removed successfully"
+                )
+            )
+            
+        } catch (error) {
+            throw new ApiError(500, "error while removing subscription", error)
+        }
+    }
 
+    const subscription = await Subscription.create(
+        {
+            channel: channelId,
+            subscriber: userID
+        }
+    )
 
+    if(!subscription){
+        throw new ApiError(500,  "Could not create document")
+    }
 
-
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            subscription,
+            "User subscribed the channel successfully"
+        )
+    )
 })
 
 const getSubscribedChannels = asyncHandler( async(req, res)=>{
-    const {channelID} = req.params
+    const {channelId} = req.params
+    console.log(channelId);
+    
 
     const channel = await User.aggregate([
         {
-            $match:channelID
+            $match:{
+                _id: new mongoose.Types.ObjectId(channelId)
+            }
         },
         //Finding the channels the specified channel is subscriber of 
         {
             $lookup:{
                 from:"subscriptions",
                 localField:"_id",
-                foreignField:"subsciber",
+                foreignField:"subscriber",
                 as:"subscribedTo"
             }
         },
@@ -39,16 +91,16 @@ const getSubscribedChannels = asyncHandler( async(req, res)=>{
             }
         }
     ])
-    if(!channel){
+    if(channel.length===0){
         throw new ApiError(500, "Could not get subscribed channel")
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
-            channel[0].subscribedChannelCount,
+            {subscribdChannels:channel[0].subscribedChannelCount},
             "Got subscribed channel successfully"
         )
     )
@@ -56,12 +108,14 @@ const getSubscribedChannels = asyncHandler( async(req, res)=>{
 
 })
 
-const getUserChannelSubscriber = asyncHandler(async(req, res)=>{
-    const {subscriberID} = req.params
+const getUserChannelSubscribers = asyncHandler(async(req, res)=>{
+    const {subscriberId} = req.params
 
     const channel = await User.aggregate([
         {
-            $match:subscriberID
+            $match:{
+                _id: new mongoose.Types.ObjectId(subscriberId)
+            }
         },
 
         //Fetching all users form which have subscribed the resultant channel of above stage --- it returns an array of objects that contains the user subscribed a specific channel
@@ -84,19 +138,23 @@ const getUserChannelSubscriber = asyncHandler(async(req, res)=>{
         }
     ])
 
-    if(!channel){
+    if(channel.length===0){
         throw new ApiError(500, "Could not get the subscribers")
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
-            channel[0].subscriberCount,
+            {subscribers:channel[0].subscriberCount},
             "Subscribers count got successfully"
         )
     )
 })
 
-
+export {
+    toggleSubscription,
+    getSubscribedChannels,
+    getUserChannelSubscribers
+}
