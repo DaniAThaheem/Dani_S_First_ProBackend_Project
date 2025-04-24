@@ -39,7 +39,7 @@ const addComment = asyncHandler(async(req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -54,7 +54,7 @@ const updateComment = asyncHandler(async(req, res)=>{
     const {content} = req.body
     
     const updatedComment = await Comment.findByIdAndUpdate(
-        {commentID},
+        commentID,
         {
             $set:{
                 content
@@ -69,7 +69,7 @@ const updateComment = asyncHandler(async(req, res)=>{
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -88,7 +88,7 @@ const deleteComment = asyncHandler(async(req, res)=>{
         throw new ApiError(500, "Could not delete comment")
     }
     return res
-    .statusCode(203)
+    .status(203)
     .json(
         new ApiResponse(
             203,
