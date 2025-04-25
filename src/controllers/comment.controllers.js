@@ -16,6 +16,21 @@ const getVideoComment = asyncHandler(async(req, res)=>{
     )
     .skip((page-1)*limit)
     .limit(limit)
+
+    if(comments.length===0){
+        throw new ApiError(500,"Could not fetch comments")
+
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            comments,
+            "Fetched comments successfully"
+        )
+    )
 })
 const addComment = asyncHandler(async(req, res)=>{
     const {videoID} = req.params

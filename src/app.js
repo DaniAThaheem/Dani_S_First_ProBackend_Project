@@ -65,10 +65,10 @@ app.use("/api/v1/playlist", playlistRouter)
 app.use("/api/v1/like", likeRouter)
 app.use("/api/v1/healthcheck", healthcheckRouter)
 app.use("/api/v1/dashboard", dashboardRouter)
+app.use("/api/v1/comment", commentRouter)
 app.use((req, res)=>{
     res.status(404).json({message:"route not found"})
 })
-app.use("/api/v1/comment", commentRouter)
 
 
 export { app }
