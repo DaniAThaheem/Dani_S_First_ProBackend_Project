@@ -31,7 +31,7 @@ const getAllVideos = asyncHandler(async(req, res)=>{
         throw new ApiError(500, "Could not get videos")
     }
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -202,12 +202,14 @@ const deleteVideo = asyncHandler( async( req, res)=>{
     const videoDestroyResult = await cloudinaryDestroy(oldVideoObj.videofile)
 
     const thumbnailDestroyResult = await cloudinaryDestroy(oldVideoObj.thumbnail)
+    console.log(videoDestroyResult, thumbnailDestroyResult);
+    
+    const result = await Video.findByIdAndDelete(videoID)
 
     if(videoDestroyResult !== "ok" || thumbnailDestroyResult !== "ok"){
         throw new ApiError( 500, "Eitherr video or thumbnail is not deleted")
     }
 
-    const result = await Video.findByIdAndDelete(videoID)
 
     if(!result){
         throw new ApiError(500, "Could not delete video from data base")
