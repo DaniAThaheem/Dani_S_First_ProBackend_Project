@@ -3,18 +3,18 @@ import { Video } from "../models/video.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import mongoose from "mongoose";
+import {mongoose} from "mongoose";
 
 const  getChannelStats = asyncHandler(async(req, res)=>{
 
-    const {userID} = req.user._id
+    const userID = req.user._id
     // subscribers
 
     const channelStats = await User.aggregate(
         [
             {
                 $match:{
-                    _id: mongoose.Schema.Types.ObjectId(userID
+                    _id: new mongoose.Types.ObjectId(userID
                     )
                 }
             },
@@ -51,20 +51,20 @@ const  getChannelStats = asyncHandler(async(req, res)=>{
                         {
                             $addFields:{
                                 countOfLikes:{
-                                    $size:"$likedVIdeos"
+                                    $size:"$likedVideos"
                                 },
                                 countOfViews:{
                                     $size:"$views"
                                 }
                             }
-                        }
+                        }                  
 
                     ]
                 }
             },
             {
                 $addFields:{
-                    vidosCount:{
+                    videosCount:{
                         $size:"$uploadedVideos"
                     }
                 }
@@ -82,15 +82,23 @@ const  getChannelStats = asyncHandler(async(req, res)=>{
                     },
                     totalViews:{
                         $sum:"$uploadedVideos.countOfViews"
+                    },
+                    totalVideos:{
+                        $sum:1
+                    },
+                    totalSubscribers:{
+                        $first:{
+                            $size:"$subscribers"
+                        }
                     }
                 }
             },
             {
                 $project:{
-                    subscriberCount:1,
-                    vidosCount,
                     totalLikes:1,
-                    totalViews:1
+                    totalViews:1,
+                    totalVideos:1,
+                    totalSubscribers:1
                 }
             }
 
@@ -98,13 +106,13 @@ const  getChannelStats = asyncHandler(async(req, res)=>{
         ]
     )
 
-    if(!channelStats){
+    if(channelStats.length===0){
         throw new ApiError(500, "Could not get channel stats"            
         )
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
@@ -119,7 +127,7 @@ const  getChannelStats = asyncHandler(async(req, res)=>{
 
 const getChannelVideos = asyncHandler(async(req, res)=>{
 
-    const {userID} = req.user._id
+    const userID = req.user._id
 
     const channelVideos = await Video.find(
         {
@@ -127,12 +135,12 @@ const getChannelVideos = asyncHandler(async(req, res)=>{
         }       
     )
 
-    if(!channelVideos){
+    if(channelVideos.length===0){
         throw new ApiError(500, "Could not fetched uploaded videos")
     }
 
     return res
-    .statusCode(200)
+    .status(200)
     .json(
         new ApiResponse(
             200,
