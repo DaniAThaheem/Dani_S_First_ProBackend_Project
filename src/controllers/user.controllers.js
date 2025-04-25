@@ -355,6 +355,46 @@ const updateAvatar = asyncHandler(
     }
 )
 
+const updateCoverImage = asyncHandler(async(req, res)=>{
+    const coverImageUrl = req.file.path               //?.avatar[0]?.path
+        if(!coverImageUrl){
+            throw new ApiError(400, "coverImage Required")
+        }
+
+        const oldUser = await User.findById(req.user?._id)
+        console.log(oldUser);
+        
+        const result = await cloudinaryDestroy(oldUser.coverImage)
+        console.log(result);
+        
+        if(result !== 'ok'){
+            throw new ApiError(500, "failed to delete file from cloudinary")
+        }
+        console.log(coverImageUrl);
+        
+        const coverImage = await cloudinaryUpload(coverImageUrl)
+
+        const user = await User.findOneAndUpdate(
+            req.user?._id,
+            {
+                coverImage:coverImage.url
+            },
+            {
+                new: true
+            }
+        ).select("-password -refreshToken")
+
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                user,
+                "Files updated successfully"
+            )
+        )
+})
+
 const getUserInfo = asyncHandler(
     async(req, res)=>{
 
@@ -503,7 +543,7 @@ export {
     getUserData,
     updateUser,
     updateAvatar,
-    
+    updateCoverImage,
     getUserInfo,
     getWatchHistory
 
