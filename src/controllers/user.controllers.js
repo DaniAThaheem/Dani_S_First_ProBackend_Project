@@ -196,10 +196,12 @@ const refreshAccessToken = asyncHandler(
         if(!userRefreshToken){
             throw new ApiError(401, "Invalid Refresh Token")
         }
-
-        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-
-        const user = await User.findOne(decodedToken?._id)
+        console.log(process.env.REFRESH_TOKEN_SECRET);
+        
+        const decodedToken = jwt.verify(userRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+        console.log(decodedToken);
+        
+        const user = await User.findById(decodedToken?._id)
         if(!user){
             throw new ApiError(401, "Invalid Cridentials")
         }
@@ -217,8 +219,8 @@ const refreshAccessToken = asyncHandler(
 
         return res
         .status(200)
-        .cookies("accessToken", accessToken, options)
-        .cookies("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
         .json(
             new ApiResponse(
                 200,
